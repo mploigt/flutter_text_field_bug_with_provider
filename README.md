@@ -1,6 +1,6 @@
 # textfieldbug
 
-Bug when using a provider and text
+Bug when changing the theme while using text fields
 
 ## How to reproduce
 
