@@ -1,44 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-void main() => runApp(ChangeNotifierProvider<AppStateNotifier>(
-    builder: (context) => AppStateNotifier(), child: MyApp()));
-
-class AppStateNotifier extends ChangeNotifier {
-  //
-  bool isDarkModeOn = false;
-
-  void updateTheme(bool isDarkModeOn) {
-    this.isDarkModeOn = isDarkModeOn;
-    notifyListeners();
-  }
-}
+void main() => runApp(MyApp());
 
 class AppTheme {
   //
   AppTheme._();
+
   static final ThemeData lightTheme = ThemeData.light();
   static final ThemeData darkTheme = ThemeData.dark();
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isDarkModeOn;
+
+  @override
+  void initState() {
+    isDarkModeOn = false;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<AppStateNotifier>(builder: (context, appState, child) {
-      return MaterialApp(
-        title: 'Flutter Demo',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: appState.isDarkModeOn ? ThemeMode.dark : ThemeMode.light,
-        home: MyHomePage(title: 'Flutter Demo Home Page'),
-      );
-    });
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: isDarkModeOn ? ThemeMode.dark : ThemeMode.light,
+      home: MyHomePage(
+          title: 'Flutter Demo Home Page',
+          isDarkModeOn: isDarkModeOn,
+          onModeChange: (value) => setState(() {
+                isDarkModeOn = value;
+              })),
+    );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key key, this.title, this.onModeChange, this.isDarkModeOn})
+      : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -50,6 +56,8 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
+  final bool isDarkModeOn;
+  final ValueChanged<bool> onModeChange;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -84,12 +92,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: <Widget>[
           Switch(
-            value: Provider
-                .of<AppStateNotifier>(context)
-                .isDarkModeOn,
-            onChanged: (boolVal) {
-              Provider.of<AppStateNotifier>(context).updateTheme(boolVal);
-            },
+            value: widget.isDarkModeOn,
+            onChanged: widget.onModeChange,
           )
         ],
       ),
